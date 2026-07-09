@@ -1,6 +1,18 @@
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
+const multer = require('multer');
+
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/images'); // Directory to save uploaded files
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
 
 // Create MySQL connection
 const connection = mysql.createConnection({
@@ -58,8 +70,15 @@ app.get('/student/:id', (req, res) => {
 app.get('/addStudent', (req, res) => {
     res.render('addStudent');
 });
-app.post('/addStudent', (req, res) => {
-    const { name, image, dob, contact } = req.body;
+
+app.post('/addStudent', upload.single('image'), (req, res) => {
+    const { name, dob, contact } = req.body;
+    let image;
+    if (req.file) {
+        image = req.file.filename; // Save only the filename
+    } else {
+        image = null;
+    }
     const sql = 'INSERT INTO student (name, image, dob, contact) VALUES (?, ?, ?, ?)';
     connection.query(sql, [name, image, dob, contact], (error, results) => {
         if (error) {
@@ -91,10 +110,14 @@ app.get('/editStudent/:id', (req, res) => {
     });
 });
 
-app.post('/editStudent/:id', (req, res) => {
+app.post('/editStudent/:id', upload.single('image'), (req, res) => {
     const studentId = req.params.id;
     // Extract student data from the request body
-    const { name, image, dob, contact } = req.body;
+    const { name, dob, contact } = req.body;
+    let image;
+    if (req.file) {
+        image = req.file.filename; // Save only the filename
+    }
     const sql = 'UPDATE student SET name = ? , image = ?, dob = ?, contact = ? WHERE studentId = ?';
     // Insert the new student into the database
     connection.query(sql, [name, image, dob, contact, studentId], (error, results) => {

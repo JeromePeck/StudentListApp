@@ -38,7 +38,7 @@
             <h3 class="mb-0">Add New Student</h3>
           </div>
           <div class="card-body">
-            <form action="/addStudent" method="POST">
+            <form action="/addStudent" method="POST" enctype="multipart/form-data">
 
               <div class="mb-3">
                 <label for="name" class="form-label">Student Name</label>
@@ -46,8 +46,9 @@
               </div>
 
               <div class="mb-3">
-                <label for="image" class="form-label">Image URL</label>
-                <input type="text" class="form-control" id="image" name="image" placeholder="Enter image URL" required>
+                <label for="image" class="form-label">Image</label>
+                <!-- <input type="text" class="form-control" id="image" name="image" placeholder="Enter image URL" required> -->
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
               </div>
 
               <div class="mb-3">
